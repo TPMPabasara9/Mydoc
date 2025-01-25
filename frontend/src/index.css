@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.active hr{
+  @apply block;
+  border: 1px solid black; /* Add visible styles */
+}
