@@ -1,14 +1,26 @@
-import React, { useContext } from "react";
-
-import { useNavigate } from "react-router-dom"; 
+import React, { useContext, useState } from "react";
 import { AppContext } from "../Context/AppContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
+const RelatedDoctors = ({ speciality, docId }) => {
+
+    const {doctors } = useContext(AppContext);
+    const navigate= useNavigate();
+
+    const [relDoc,setRelDocs] = useState([]);
+
+    useEffect(()=>{
+        if(doctors.length > 0 && speciality){
+
+            const doctorsData = doctors.filter((doc) => doc.speciality === speciality && doc._id !== docId)
+            setRelDocs(doctorsData)
+        }
+    },[speciality,doctors,docId])
 
 
-const TopDoctors = () => {
-    const navigate = useNavigate();
-    const {doctors} = useContext(AppContext);
-return (
-    <section className="container mx-auto px-3 sm:px-4 py-16">
+    return (
+        <section className="container mx-auto px-3 sm:px-4 py-16">
         <div className="text-center mb-12">
             <h1 className="text-3xl md:text-4xl font-semibold text-gray-800 mb-4">
                 Top Doctors to Book
@@ -19,11 +31,11 @@ return (
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-3 sm:px-0">
-            {doctors.slice(0, 10).map((doctor, index) => (
+            {relDoc.slice(0, 5).map((doctor, index) => (
                 <article
                     key={index}
                     className="group border border-blue-100 rounded-xl overflow-hidden shadow-sm transform hover:scale-110 transition duration-300 ease-in-out hover:border-blue-700"
-                    onClick={() =>{ navigate(`/appointment/${doctor._id}`) ; scrollTo(0,0)} }
+                    onClick={() =>{ navigate(`/appointment/${doctor._id}`); scrollTo(0,0)}  }
                 >
                     <div className="aspect-square bg-blue-50 relative overflow-hidden">
                         <img
@@ -53,6 +65,6 @@ return (
         </div>
     </section>
 );
-};
+    }
 
-export default TopDoctors;
+    export default RelatedDoctors;

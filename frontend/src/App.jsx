@@ -3,13 +3,14 @@ import './index.css';
 import { Route,Routes } from 'react-router-dom';
 import Home from './Pages/Home';
 import Login from './Pages/Login';
-import Appointmnet from './Pages/Appointmnet';
+import Appointment from './Pages/Appointmnet';
 import Contact from './Pages/Contact';
 import Profile from './Pages/Profile';
 import Doctors from './Pages/Doctors';
 import About from './Pages/About';
 import MyAppointments from './Pages/MyAppointments';
 import Navbar from './Components/Navbar';
+
 
 
 const App = () => {
@@ -19,13 +20,15 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/about" element={<About/>} />
+        <Route path="/doctors" element={<Doctors/>} />
         <Route path="/doctors/:speciality" element={<Doctors/>} />
         <Route path="/login" element={<Login/>} />
         <Route path="/contact" element={<Contact/>} />
         <Route path="/my-profile" element={<Profile/>} />
         <Route path="/my-appointments" element={<MyAppointments/>} />
-        <Route path="/appointment/:doctorId" element={<Appointmnet/>} />
+        <Route path="/appointment/:docId" element={<Appointment/>} />
       </Routes>
+    
     </div>
   
   )
