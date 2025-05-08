@@ -12,7 +12,14 @@ connectDB();
 connectCloudinary();
 //middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+    {
+        origin:'http://localhost:5174',
+        credentials:true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'aToken']
+    }
+));
 
 //api endpoints
 app.use('/api/admin',adminRouter);
