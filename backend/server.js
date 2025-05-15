@@ -4,6 +4,8 @@ import cors from 'cors';
 import connectDB from './config/mongoDB.js';
 import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './routes/adminRoute.js';
+import doctorRouter from './routes/doctorRoute.js';
+import userRouter from './routes/userRoute.js';
 
 
 const app = express();
@@ -12,17 +14,12 @@ connectDB();
 connectCloudinary();
 //middleware
 app.use(express.json());
-app.use(cors(
-    {
-        origin:'http://localhost:5174',
-        credentials:true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'aToken']
-    }
-));
+app.use(cors());
 
 //api endpoints
 app.use('/api/admin',adminRouter);
+app.use('/api/doctor',doctorRouter);
+app.use('/api/user',userRouter);
 
 
 

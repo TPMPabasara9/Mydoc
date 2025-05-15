@@ -3,6 +3,8 @@ import validator from 'validator';
 import {v2 as cloudinary} from 'cloudinary';
 import Doctor from '../models/doctorModel.js';
 import jwt from 'jsonwebtoken';
+import doctorModel from '../models/doctorModel.js';
+import { json } from 'express';
 
 
 
@@ -12,18 +14,20 @@ import jwt from 'jsonwebtoken';
 
 const addDoctor = async (req, res) => { 
     try {
-        const {name,email,speciality,password,degree,experience,about,available,address,fee} = req.body;
+
+        const {name,email,speciality,password,degree,experience,about,address,fee} = req.body;
         const imageFile = req.file
 
-    console.log(req.body);
-    console.log(req.file);
+        console.log("Hit the request");
 
-    if (!imageFile) {
+        
+
+        if(!imageFile) {
         return res.status(400).json({ success: false, message: "Image is required" });
     }
 
         //checking for all the fields
-        if(!name || !email || !speciality || !password || !imageFile || !degree || !experience || !about || !available || !address || !fee){
+        if(!name || !email || !speciality || !password   || !degree || !experience || !about  || !address || !fee){
             return res.json({success:false,message:"Please fill all the fields"})
         }
 
@@ -40,6 +44,8 @@ const addDoctor = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+   
+
         //uploading the image to cloudinary
         const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
             folder: 'doctors',
@@ -54,13 +60,13 @@ const addDoctor = async (req, res) => {
             name,
             email,
             speciality,
+            image:imageUrl,
             password: hashedPassword,
-            image: imageUrl,
             degree,
             experience,
             about,
-            available,
             fee,
+            available:true,
             address:JSON.parse(address),
             date: Date.now(),
         }
@@ -102,6 +108,20 @@ const adminLogin = async (req, res) => {
         res.json({success:false,message:"Internal server error"});
     }
 }
+//api to get all doctors list for admin
+
+const allDoctors = async (req,res) => {
+    try {
+         
+        const doctors =  await doctorModel.find({}).select('-password');
+        res.json({success:true,doctors})
+
+    } catch (error) {
+        console.log(error);
+        res.json({success:false,message:error.message})
+    }
+    
+}
 
 
-export {addDoctor,adminLogin}
+export {addDoctor,adminLogin,allDoctors}

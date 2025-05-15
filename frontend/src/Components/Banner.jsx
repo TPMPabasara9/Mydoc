@@ -5,7 +5,7 @@ import { assets } from '../assets/assets/assets/assets_frontend/assets';
 const Banner = () => {
     const naviagte = useNavigate();
     return (
-        <div className='flex bg-indigo-400 rounded-lg px-6 sm:px-10 md:px-12 my-20 md:mx-10'>
+        <div className='flex bg-indigo-500 rounded-lg px-6 sm:px-10 md:px-12 my-20 md:mx-10'>
             {/*........Left side .....*/}
                         <div className='flex-1 py-8 sm:py-10 md:py-16 lg:py-24 lg:pl-5'>
                             <div className='text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold text-white'>

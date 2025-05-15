@@ -8,7 +8,9 @@ const userSchema = new mongoose.Schema({
   
     email:{
         type: String,
+        unique:true,
         required: true
+
     },
     password: {
         type: String,
@@ -27,7 +29,10 @@ const userSchema = new mongoose.Schema({
          default:{line1:'',line2:'',city:''}
    },
    gender: {type: String, default:"Not Selected"},
-   phone:{type:String,default:'000000000'}
+   phone:{type:String,default:'000000000'},
+   
+   dob:{type:Date,default:'2010-07-21'},
+
    },{minimize:false})
 
 

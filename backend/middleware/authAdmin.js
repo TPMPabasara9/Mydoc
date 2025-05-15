@@ -14,6 +14,7 @@ const authAdmin  = async (req,res,next) =>{
             return res.json({success:false,message:"Invalid token"});
         }
 
+        next();
         
     } catch (error) {
         console.log(error);
