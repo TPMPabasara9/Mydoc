@@ -4,7 +4,7 @@ import {v2 as cloudinary} from 'cloudinary';
 import Doctor from '../models/doctorModel.js';
 import jwt from 'jsonwebtoken';
 import doctorModel from '../models/doctorModel.js';
-import { json } from 'express';
+
 
 
 
@@ -122,6 +122,8 @@ const allDoctors = async (req,res) => {
     }
     
 }
+
+
 
 
 export {addDoctor,adminLogin,allDoctors}
