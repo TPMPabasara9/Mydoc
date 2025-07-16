@@ -9,6 +9,7 @@ import appointmentModel from "../models/appointmentModel.js"
 
 
 
+
 //API to register the user
 
 const registerUser = async (req, res) => {
@@ -215,8 +216,41 @@ const listAppointment = async  (req, res) => {
         res.json({ success: false, message: error.message })
     }
 }
+//Api to cancel the appointment
+
+const cancelAppointment  = async (req,res) =>{
+    try {
+        const {userId,appointmentId} = req.body;
+        const appointmentData = await appointmentModel.findById(appointmentId);
+        if(!appointmentData){
+            return res.json({success:false,message:"Appointment not found"})
+        }
+        //verify appointment user
+        if( appointmentData.userId!==userId){
+            return res.json({success:false,message:"You are not authorized to cancel this appointment"})
+        }
+        //remove appointment from appointment collection
+        await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
+        //remove appointment from doctor's booked slots
+        const {docId,slotDate,slotTime} = appointmentData
+        const doctorData = await doctorModel.findById(docId);
+
+        let slots_booked = doctorData.slots_booked;
+
+        slots_booked[slotDate] = slots_booked[slotDate].filter(slot => slot !== slotTime);
+        await doctorModel.findByIdAndUpdate(docId,{slots_booked})
+
+        res.json({success:true,message:"Appointment cancelled successfully"})
+
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+        
+    }
+}
 
 
 
 
-export { registerUser, loginUser, getProfile, updateProfile,bookAppointment,listAppointment }
+export { registerUser, loginUser, getProfile, updateProfile,bookAppointment,listAppointment,cancelAppointment }
