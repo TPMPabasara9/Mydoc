@@ -4,10 +4,11 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { data } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const MyAppointments = () => {
 
-  const {backendUrl , token } = useContext(AppContext);
+  const {backendUrl , token ,getDoctorsData} = useContext(AppContext);
 
   const [appointments,setAppointments] = useState([]);
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -39,6 +40,26 @@ const slotDateFormat = (slotDate) => {
     }
   }
 
+  const cancelAppointmnet = async (appointmentId) =>{
+    try {
+      console.log("appoitmnetId",appointmentId)
+      const {data} = await axios.post(`${backendUrl}/api/user/cancel-appointment`,{appointmentId},{headers:{token}});
+      if(data.success){
+        toast.success(data.message);
+        getUserAppointments();
+        getDoctorsData();
+
+      
+    } else{
+      toast.error(data.message);
+    }
+  }catch (error) {
+      console.error("Error canceling appointment:", error);
+      toast.error(error.message);
+      
+    }
+  }
+
   useEffect(()=>{
     if(token){
       getUserAppointments();
@@ -65,8 +86,11 @@ const slotDateFormat = (slotDate) => {
           </div>
           <div>
             <div className='flex flex-col gap-2 justify-end'>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2  border hover:bg-indigo-500 hover:text-white transition-all'>Pay Online</button>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2  border hover:bg-red-500 hover:text-white transition-all'>Cancel Appointentt</button>
+              {!item.cancelled &&<button
+              
+              className='text-sm text-stone-500 text-center sm:min-w-48 py-2  border hover:bg-indigo-500 hover:text-white transition-all'>Pay Online</button>}
+              {!item.cancelled &&<button onClick={()=>cancelAppointmnet(item._id)}  className='text-sm text-stone-500 text-center sm:min-w-48 py-2  border hover:bg-red-500 hover:text-white transition-all'>Cancel Appointentt</button>}
+              {item.cancelled && <button className='text-sm text-red-600 text-center sm:min-w-48 py-2  border bg-amber-50'>Appointment Cancelled</button>}
             </div>
           </div>
         </div>
