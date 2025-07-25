@@ -11,6 +11,7 @@ import About from './Pages/About';
 import MyAppointments from './Pages/MyAppointments';
 import Navbar from './Components/Navbar';
   import { ToastContainer, toast } from 'react-toastify';
+import Footer from './Components/Footer';
 
 
 
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/my-appointments" element={<MyAppointments/>} />
         <Route path="/appointment/:docId" element={<Appointment/>} />
       </Routes>
+      <Footer/>
     
     </div>
   
