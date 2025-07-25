@@ -20,6 +20,8 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
+#sample files
+
 *.sln
 *.sw?
 
