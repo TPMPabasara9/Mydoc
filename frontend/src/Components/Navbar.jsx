@@ -49,19 +49,19 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
-            {/* Logo */}
-            <div 
-              onClick={() => navigate('/')} 
-              className="flex-shrink-0 cursor-pointer group"
-            >
-              <img 
-                className="h-10 w-auto transition-transform duration-200 group-hover:scale-105" 
-                src="/src/assets/logo.svg" 
-                alt="logo" 
-              />
-            </div>
+          
+                  <div 
+                    onClick={() => navigate('/')} 
+                    className="flex-shrink-0 cursor-pointer group"
+                  >
+                    <img 
+                    className="h-15 w-auto transition-transform duration-200 group-hover:scale-105" 
+                    src="/src/assets/logo.svg" 
+                    alt="logo" 
+                    />
+                  </div>
 
-            {/* Desktop Navigation */}
+                  {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => (
                 <NavLink
