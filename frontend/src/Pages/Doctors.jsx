@@ -77,15 +77,7 @@ useEffect(() => {
         </div>
         
         <div className="flex gap-4">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600"
-          >
-            <option value="recommended">Recommended</option>
-            <option value="rating">Highest Rated</option>
-            <option value="experience">Most Experienced</option>
-          </select>
+ 
         </div>
       </div>
 
