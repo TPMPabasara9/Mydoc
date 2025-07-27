@@ -134,6 +134,42 @@ const allAppointments = async (req,res) =>{
 
 }
 
+const adminDashboard = async (req,res) =>{
+    try {
+        const totalDoctors = await doctorModel.find({})
+        const users = await appointmentModel.find({}).distinct('userId');
+        const totalAppointments = await appointmentModel.find({});
+        const appointmentsToday = await appointmentModel.find({
+            datetime: {
+                $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                $lt: new Date(new Date().setHours(23, 59, 59, 999))
+            }
+        });
+    
+
+    const dashData = {
+        totalDoctors: totalDoctors.length,
+        totalUsers: users.length,
+        totalAppointments: totalAppointments.length,
+        latestappointments : totalAppointments.reverse().slice(0,5),
+        specialties: totalDoctors.reduce((acc, doctor) => {
+            acc[doctor.speciality] = (acc[doctor.speciality] || 0) + 1;
+            return acc;
+        }, {}),
+
+        
+    }
+    res.json({success:true,dashData});
+    
+}
+    catch (error) {
+        console.log(error);
+        res.json({success:false,message:error.message});
+    }
 
 
-export {addDoctor,adminLogin,allDoctors,allAppointments}
+}
+
+
+
+export {addDoctor,adminLogin,allDoctors,allAppointments, adminDashboard};
