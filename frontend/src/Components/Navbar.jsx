@@ -153,7 +153,7 @@ const Navbar = () => {
                   onClick={() => navigate('/login')}
                   className="hidden md:flex items-center px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
                 >
-                  Create Account
+                  Login 
                 </button>
               )}
 
