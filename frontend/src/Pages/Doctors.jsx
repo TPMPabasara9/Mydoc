@@ -29,19 +29,7 @@ const applyFilter = () => {
     );
   }
 
-  // Apply sorting
-  switch (sortBy) {
-    case 'rating':
-      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      break;
-    case 'experience':
-      filtered.sort((a, b) => (b.experience || 0) - (a.experience || 0));
-      break;
-    case 'recommended':
-    default:
-      // Keep default order or implement custom recommendation logic
-      break;
-  }
+
 
   setfilterDoc(filtered);
 }
@@ -106,7 +94,8 @@ useEffect(() => {
             { key: 'Dermotologist', label: 'Dermatologist' },
             { key: 'Pediatricians', label: 'Pediatrician' },
             { key: 'Neurologists', label: 'Neurologist' },
-            { key: 'Gastronologist', label: 'Gastroenterologist' }
+            { key: 'Gastronologist', label: 'Gastroenterologist' },
+            {key : 'Psychiatrist', label: 'Psychiatrist' }
           ].map(({ key, label }) => (
             <div
               key={key}
