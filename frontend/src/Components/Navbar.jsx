@@ -177,7 +177,7 @@ const Navbar = () => {
           <div className="flex flex-col h-full">
             {/* Mobile menu header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <img className="h-8 w-auto" src={assets.logo} alt="Logo" />
+              <img className="h-16 w-auto" src='/src/assets/logo.svg' alt="Logo" />
               <button
                 onClick={() => setShowMenu(false)}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
