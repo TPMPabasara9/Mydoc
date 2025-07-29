@@ -200,8 +200,22 @@ const bookAppointment = async (req,res) =>{
         res.json({success:false,message:error.message})
     }
 }
+//API to get all doctors
 
-//Api to get user appointments //
+const allDoctors = async (req,res) => {
+    try {
+         
+        const doctors =  await doctorModel.find({}).select('-password');
+        res.json({success:true,doctors})
+
+    } catch (error) {
+        console.log(error);
+        res.json({success:false,message:error.message})
+    }
+    
+}
+
+
 
 const listAppointment = async  (req, res) => {
     try {
@@ -253,4 +267,4 @@ const cancelAppointment  = async (req,res) =>{
 
 
 
-export { registerUser, loginUser, getProfile, updateProfile,bookAppointment,listAppointment,cancelAppointment }
+export { registerUser, loginUser, getProfile, updateProfile,bookAppointment,listAppointment,cancelAppointment ,allDoctors}
