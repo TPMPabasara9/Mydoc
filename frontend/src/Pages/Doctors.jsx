@@ -93,7 +93,7 @@ useEffect(() => {
             { key: 'Gynocologist', label: 'Gynecologist' },
             { key: 'Dermotologist', label: 'Dermatologist' },
             { key: 'Pediatricians', label: 'Pediatrician' },
-            { key: 'Neurologists', label: 'Neurologist' },
+            { key: 'Neurologist', label: 'Neurologist' },
             { key: 'Gastronologist', label: 'Gastroenterologist' },
             {key : 'Psychiatrist', label: 'Psychiatrist' }
           ].map(({ key, label }) => (

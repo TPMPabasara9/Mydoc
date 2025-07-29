@@ -148,33 +148,70 @@ useEffect(()=>{
     },[doctors,docId])
 
   return docInfo && (
-    <div>
-    <div className='flex flex-col sm:flex-row gap-4 mb-16'>
-      {/*--------- Doctor Details----------*/}
-        <div className='flex justify-center sm:justify-start'>
-          <img className='bg-indigo-500 w-full sm:max-w-72 rounded-lg' src={docInfo.image} alt="" />
+   <div className="mb-16">
+  <div className='flex flex-col sm:flex-row gap-6'>
+    {/*--------- Doctor Image Section ----------*/}
+    <div className='flex justify-center sm:justify-start'>
+      <div className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl transform rotate-2 group-hover:rotate-3 transition-transform duration-300"></div>
+        <img 
+          className='relative w-full sm:max-w-72 h-80 sm:h-96 object-cover rounded-2xl shadow-xl border-4 border-white group-hover:scale-105 transition-transform duration-300' 
+          src={docInfo.image} 
+          alt={docInfo.name}
+        />
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+          <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
         </div>
-
-        <div className='flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0'>
-          {/*---------Doc Info : Name, degree , experience -------*/}
-        <p className='flex items gap-2 text-2xl font-medium text-gray-900'>{docInfo.name} 
-          <img className='w-5' src={assets.verified_icon} alt=""  />
-          </p>
-          <div className='flex items-center gap-2 text-sm mt-1 text-gray-600'>
-            <p>{docInfo.degree} - {docInfo.speciality}</p>
-            <button className=' py-0.5 border text-xs rounded-4xl'>{docInfo.experience}</button>
-          </div>
-          {/*------doctro about --------*/}
-          <div>
-            <p className='flex items-center gap-1 text-sm font-medium text-gray-900 mt-3'>About <img src={assets.info_icon} alt=""></img>
-            </p>
-            <p className='text-sm text-gray -500 max-w-[700px] mt-1'>{docInfo.about}</p>
-          </div>
-          <p className='text-gray-500 font-medium mt-4'>
-            Appointment fee: <span className='text-gray-500'>{currencySymbol}{docInfo.fees}</span>
-          </p>
       </div>
     </div>
+
+    {/*--------- Doctor Information Card ----------*/}
+    <div className='flex-1 bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8 mx-2 sm:mx-0 mt-[-60px] sm:mt-0 relative overflow-hidden'>
+      {/* Background Pattern */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-100/20 to-purple-100/20 rounded-full -translate-y-20 translate-x-20"></div>
+      
+      <div className="relative z-10">
+        {/*--------- Doctor Name & Verification -------*/}
+        <div className="mb-4">
+          <div className='flex items-center gap-2 mb-2'>
+            <h1 className='text-2xl font-medium text-gray-900'>
+              {docInfo.name}
+            </h1>
+            <img className='w-5' src={assets.verified_icon} alt="Verified" />
+          </div>
+          
+          {/*--------- Credentials & Experience -------*/}
+          <div className='flex items-center gap-2 text-sm text-gray-600 mb-1'>
+            <span className='font-medium'>{docInfo.degree} - {docInfo.speciality}</span>
+          </div>
+          <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full text-xs font-medium text-gray-700 border">
+            {docInfo.experience}
+          </div>
+        </div>
+
+        {/*------ Doctor About Section --------*/}
+        <div className="mb-6">
+          <div className='flex items-center gap-1 mb-2'>
+            <h3 className='text-sm font-medium text-gray-900'>About</h3>
+            <img className="w-4 h-4" src={assets.info_icon} alt="Info" />
+          </div>
+          
+          <p className='text-sm text-gray-500 max-w-[700px] leading-relaxed'>
+            {docInfo.about}
+          </p>
+        </div>
+
+        {/*------ Appointment Fee --------*/}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
+          <p className='text-gray-700 font-medium'>
+            Appointment fee: <span className='text-indigo-600 font-semibold text-lg'>{currencySymbol} {docInfo.fee}.00</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
     {/*-------booking slots---------*/}
