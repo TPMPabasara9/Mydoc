@@ -98,6 +98,7 @@ const adminLogin = async (req, res) => {
         if(email===process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
             const token = jwt.sign(email+password,process.env.JWT_SECRET);
             res.json({success:true,token});
+            
         }
         else{
             res.json({success:false,message:"Invalid credentials"});
@@ -123,6 +124,25 @@ const allDoctors = async (req,res) => {
     }
     
 }
+const changeAvailability = async (req,res) =>{
+
+    try {
+
+        const {docId} = req.body
+
+        const docData = await doctorModel.findById(docId)
+        console.log(docData)
+        await doctorModel.findByIdAndUpdate(docId,{available:!docData.available})
+        res.json({success:true,message:'Availability change'})
+
+        
+    } catch (error) {
+         console.log(error);
+        res.json({success:false,message:error.message})
+    }
+}
+
+
 const allAppointments = async (req,res) =>{
     try {
         const appointments = await appointmentModel.find({});
@@ -172,4 +192,4 @@ const adminDashboard = async (req,res) =>{
 
 
 
-export {addDoctor,adminLogin,allDoctors,allAppointments, adminDashboard};
+export {addDoctor,adminLogin,allDoctors,allAppointments, adminDashboard,changeAvailability};
