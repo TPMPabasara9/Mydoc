@@ -2,16 +2,23 @@ import React, { useContext } from 'react'
 import { assets } from '../assets/assets_admin/assets';
 import { AdminContext } from '../context/AdminContext';
 import { useNavigate } from 'react-router-dom';
+import { DoctorContext } from '../context/DoctorContext';
 
 const Navbar = () =>{
 
     const {aToken,setAToken} = useContext(AdminContext)
-    const navigate =  useNavigate()
+    const {dToken,setDToken} = useContext(DoctorContext);
+    const navigate =  useNavigate();
     
     const logout =  () =>{
         navigate('/')
-        aToken && setAToken('')
+        aToken   && setAToken('')
         aToken && localStorage.removeItem('aToken')
+        // dToken && localStorage.removeItem('dToken'); // Uncomment if you want to clear doctor token on admin logout
+        navigate('/')
+        dToken && setDToken('')
+        dToken && localStorage.removeItem('dToken');
+
     }
 
    
