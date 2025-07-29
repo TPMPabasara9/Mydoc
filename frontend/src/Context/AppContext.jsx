@@ -6,7 +6,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => { 
 
-    const currencySymbol = ' $'
+    const currencySymbol = ' LKR'
     const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 
@@ -19,7 +19,7 @@ const AppContextProvider = (props) => {
     const getDoctorsData = async () =>{
         try {
             
-            const {data} = await axios.get(backendUrl + '/api/doctor/list')
+            const {data} = await axios.get(backendUrl + '/api/user/get-doctors', {headers:{token}});
             if(data.success){
                 setDoctors(data.doctors)
             }else{
