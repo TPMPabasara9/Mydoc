@@ -109,4 +109,45 @@ try {
         res.json({success:false,message:error.message});
 }
 }
-export {loginDoctor,getAppointments,doctorProfile,appointmentComplete,appointmentCancel};
+//API to get doctor dash board for doctor pannel
+const doctorDashbnoard = async (req,res) =>{
+    try {
+        const {docId} = req.body;
+
+        const appointments = await appointmentModel.find({ docId: docId });
+
+        let earnings = 0;
+        appointments.map((appointment)=>{
+            if(appointment.isCompleted && !appointment.cancelled){
+                earnings += appointment.ammount;
+            }
+            
+        })
+
+
+
+        let patients = []
+
+        appointments.map((appointment)=>{
+            if(!patients.includes(appointment.userId)){
+                patients.push(appointment.userId);
+            }
+
+
+        })
+
+        const dashData = {
+            earnings,
+            appointments: appointments.length,
+            patients: patients.length,
+            latestAppointment: appointments.reverse().slice(0,5)
+        }
+        res.json({success:true,dashData});
+        
+    } catch (error) {
+        console.log(error);
+        res.json({success:false,message:error.message});
+        
+    }
+}
+export {loginDoctor,getAppointments,doctorProfile,appointmentComplete,appointmentCancel,doctorDashbnoard};
