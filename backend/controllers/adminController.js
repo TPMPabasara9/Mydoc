@@ -5,6 +5,7 @@ import Doctor from '../models/doctorModel.js';
 import jwt from 'jsonwebtoken';
 import doctorModel from '../models/doctorModel.js';
 import appointmentModel from '../models/appointmentModel.js';
+import userModel from '../models/userModel.js';
 
 
 
@@ -156,38 +157,52 @@ const allAppointments = async (req,res) =>{
 
 const adminDashboard = async (req,res) =>{
     try {
-        const totalDoctors = await doctorModel.find({})
+        const totalDoctors = await doctorModel.find({});
         const users = await appointmentModel.find({}).distinct('userId');
         const totalAppointments = await appointmentModel.find({});
+        
+        // Get recent patients (last 5 registered users)
+        const recentPatients = await userModel.find({})
+            .sort({ _id: -1 })
+            .limit(5)
+            .select('name email image phone address dob');
+
+        // Get appointments with populated doctor and user data
+        const latestAppointments = await appointmentModel.find({})
+            .populate('docId', 'name speciality image')
+            .populate('userId', 'name email image phone')
+            .sort({ _id: -1 })
+            .limit(5);
+
         const appointmentsToday = await appointmentModel.find({
-            datetime: {
+            slotDate: {
                 $gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 $lt: new Date(new Date().setHours(23, 59, 59, 999))
             }
         });
-    
 
-    const dashData = {
-        totalDoctors: totalDoctors.length,
-        totalUsers: users.length,
-        totalAppointments: totalAppointments.length,
-        latestappointments : totalAppointments.reverse().slice(0,5),
-        specialties: totalDoctors.reduce((acc, doctor) => {
-            acc[doctor.speciality] = (acc[doctor.speciality] || 0) + 1;
-            return acc;
-        }, {}),
-
+        const dashData = {
+            totalDoctors: totalDoctors.length,
+            totalUsers: users.length,
+            totalAppointments: totalAppointments.length,
+            appointmentsToday: appointmentsToday.length,
+            latestappointments: latestAppointments,
+            recentPatients: recentPatients.map(patient => ({
+                ...patient.toObject(),
+                joinDate: patient._id.getTimestamp()
+            })),
+            specialties: totalDoctors.reduce((acc, doctor) => {
+                acc[doctor.speciality] = (acc[doctor.speciality] || 0) + 1;
+                return acc;
+            }, {}),
+        }
         
-    }
-    res.json({success:true,dashData});
-    
-}
-    catch (error) {
+        res.json({success:true,dashData});
+        
+    } catch (error) {
         console.log(error);
         res.json({success:false,message:error.message});
     }
-
-
 }
 //API to update the completed appointment for admin pannel
 const changeStatus = async (req,res) =>{
