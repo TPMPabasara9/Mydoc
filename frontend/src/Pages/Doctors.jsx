@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../Context/AppContext.jsx';
+import { toast } from 'react-toastify';
 const Doctors = () => {
   const navigate = useNavigate();
 
@@ -99,7 +100,11 @@ useEffect(() => {
           ].map(({ key, label }) => (
             <div
               key={key}
-              onClick={() => speciality === key ? navigate('/doctors') : navigate(`/doctors/${key}`)}
+              onClick={() => {
+                
+                  speciality === key ? navigate('/doctors') : navigate(`/doctors/${key}`);
+                
+              }}
               className={`w-full px-4 py-3 rounded-lg transition-all cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2 ${
                 speciality === key 
                   ? 'bg-indigo-100 text-indigo-600 font-medium shadow-sm' 
@@ -127,8 +132,14 @@ useEffect(() => {
               {filterDoc.map((doctor, index) => (
                 <article
                   key={index}
-                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                  onClick={() => navigate(`/appointment/${doctor._id}`)}
+                  className={`group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${doctor.available ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  onClick={() => {
+                    if (doctor.available) {
+                      navigate(`/appointment/${doctor._id}`);
+                    } else {
+                      toast.warning('This doctor is currently unavailable for appointments');
+                    }
+                  }}
                 >
                   <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50">
                     <img
@@ -138,10 +149,16 @@ useEffect(() => {
                       loading="lazy"
                     />
                     <div className="absolute top-3 right-3">
+                      {doctor.available ? (
                       <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-green-600 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                         Available
                       </span>
+                      ) : (
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-red-600 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                        Unavailable
+                      </span>)}
                     </div>
                   </div>
 
@@ -152,8 +169,23 @@ useEffect(() => {
                     <p className="text-gray-500 text-sm mt-1">{doctor.speciality}</p>
                     
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      <button className="w-full px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white rounded-lg text-sm font-medium transition-all duration-300">
-                        Book Appointment
+                      <button 
+                        className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          doctor.available 
+                            ? 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!doctor.available) {
+                            toast.warning('This doctor is currently unavailable for appointments');
+                          } else {
+                            navigate(`/appointment/${doctor._id}`);
+                          }
+                        }}
+                        disabled={!doctor.available}
+                      >
+                        {doctor.available ? 'Book Appointment' : 'Currently Unavailable'}
                       </button>
                     </div>
                   </div>
