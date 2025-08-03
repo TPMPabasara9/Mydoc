@@ -1,11 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
+import { AppContext } from "../../context/AppContext";
+import UserDataCard from "../../components/userDataCard";
+
+// Modal state
+
 
 const AllAppointments = () => {
-  const { appointments = [], aToken, getAllAppointments } = useContext(AdminContext);
+  const { appointments = [], aToken, getAllAppointments ,changeStatus} = useContext(AdminContext);
+  const { slotDateFormat,currencySymbol } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
+  const [showUserData, setShowUserData] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     if (aToken) {
@@ -14,19 +22,28 @@ const AllAppointments = () => {
     } else {
       console.log("❌ No token available");
     }
-  }, [aToken]);
+  }, [aToken],[appointments]);
+
+
+  // Helper to get status string
+  const getStatus = (appointment) => {
+    if (appointment.cancelled) return 'cancelled';
+    if (appointment.isCompleted) return 'completed';
+    return 'pending';
+  };
 
   // Filter and sort appointments
   const filteredAppointments = appointments
     .filter(appointment => {
       const matchesSearch = appointment.userData?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            appointment.docData?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+      const status = getStatus(appointment);
+      const matchesStatus = statusFilter === "all" || status === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       if (sortBy === "date") {
-        return new Date(a.slotDate) - new Date(b.slotDate);
+        return new Date(b.slotDate) - new Date(a.slotDate);
       } else if (sortBy === "patient") {
         return a.userData?.name?.localeCompare(b.userData?.name);
       } else if (sortBy === "doctor") {
@@ -48,15 +65,7 @@ const AllAppointments = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+
 
   const formatTime = (timeString) => {
     const [hours, minutes] = timeString.split(':');
@@ -107,7 +116,7 @@ const AllAppointments = () => {
                 <div className="ml-3">
                   <p className="text-sm text-gray-600">Completed</p>
                   <p className="text-xl font-semibold text-gray-900">
-                    {appointments.filter(a => a.status?.toLowerCase() === 'completed').length}
+                    {appointments.filter(a => getStatus(a) === 'completed').length}
                   </p>
                 </div>
               </div>
@@ -123,7 +132,7 @@ const AllAppointments = () => {
                 <div className="ml-3">
                   <p className="text-sm text-gray-600">Pending</p>
                   <p className="text-xl font-semibold text-gray-900">
-                    {appointments.filter(a => a.status?.toLowerCase() === 'pending').length}
+                    {appointments.filter(a => getStatus(a) === 'pending').length}
                   </p>
                 </div>
               </div>
@@ -139,7 +148,7 @@ const AllAppointments = () => {
                 <div className="ml-3">
                   <p className="text-sm text-gray-600">Cancelled</p>
                   <p className="text-xl font-semibold text-gray-900">
-                    {appointments.filter(a => a.status?.toLowerCase() === 'cancelled').length}
+                    {appointments.filter(a => getStatus(a) === 'cancelled').length}
                   </p>
                 </div>
               </div>
@@ -244,7 +253,7 @@ const AllAppointments = () => {
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span className="text-sm font-medium text-gray-900">{formatDate(appointment.slotDate)}</span>
+                            <span className="text-sm font-medium text-gray-900">{slotDateFormat(appointment.slotDate)}</span>
                           </div>
                           <div className="flex items-center space-x-2">
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,30 +266,40 @@ const AllAppointments = () => {
 
                       {/* Status & Fee */}
                       <div className="lg:w-1/4 flex flex-col lg:items-end space-y-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(appointment.status || 'pending')}`}>
-                          {appointment.status || 'Pending'}
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(getStatus(appointment))}`}>
+                          {getStatus(appointment)}
                         </span>
                         <div className="flex items-center space-x-1">
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                          </svg>
-                          <span className="font-semibold text-gray-900">${appointment.docData?.fee || '0'}</span>
+                       
+                          <span className="font-semibold text-gray-900">{currencySymbol} {appointment.docData?.fee || '0'}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <button className="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors duration-200 text-sm">
+                      <button 
+                        className="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors duration-200 text-sm" 
+                        onClick={() => {
+                          setSelectedUser(appointment.userData);
+                          setShowUserData(true);
+                          
+                        }}
+                      > 
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                         View Details
                       </button>
-                      {appointment.status?.toLowerCase() === 'pending' && (
+                      {getStatus(appointment) === 'pending' && (
                         <>
-                          <button className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm">
+                          <button 
+                            className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm" 
+                            onClick={() => {
+                              changeStatus({ appointmentId: appointment._id });
+                            }}
+                          >
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
@@ -316,6 +335,17 @@ const AllAppointments = () => {
           )}
         </div>
       </div>
+
+      {/* User Data Modal */}
+      {showUserData && selectedUser && (
+        <UserDataCard 
+          userData={selectedUser}
+          onClose={() => {
+            setShowUserData(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
     </div>
   );
 };
