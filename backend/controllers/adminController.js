@@ -146,7 +146,7 @@ const changeAvailability = async (req,res) =>{
 const allAppointments = async (req,res) =>{
     try {
         const appointments = await appointmentModel.find({});
-        res.json({success:true,appointments});
+        res.json({success:true,appointments:appointments.reverse()});
     } catch (error) {
         console.log(error);
         res.json({success:false,message:error.message});
@@ -189,7 +189,23 @@ const adminDashboard = async (req,res) =>{
 
 
 }
+//API to update the completed appointment for admin pannel
+const changeStatus = async (req,res) =>{
+    try{
+        const {appointmentId} = req.body;
+
+        const appointmentData = await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true ,payment: true});
+        if(appointmentData) {
+            res.json({success:true,message:"Appointment status updated successfully"});
+        } else {
+            res.status(404).json({success:false,message:"Appointment not found"});
+        }
+    }catch{
+        console.log(error);
+        res.json({success:false,message:error.message});
+    }
+}
 
 
 
-export {addDoctor,adminLogin,allDoctors,allAppointments, adminDashboard,changeAvailability};
+export {addDoctor,adminLogin,allDoctors,allAppointments, adminDashboard,changeAvailability,changeStatus};
