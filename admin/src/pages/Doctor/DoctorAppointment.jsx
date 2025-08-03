@@ -35,7 +35,7 @@ const DoctorAppointment = () => {
       }
     };
     fetchAppointments();
-  }, [dToken]);
+  }, [dToken],[appointments]);
 
   useEffect(() => {
     const groupByDate = () => {
@@ -75,12 +75,44 @@ function formatDateToCustom(date) {
   const tileContent = ({ date, view }) => {
     const dateString = formatDateToCustom(date);
     if (view === 'month' && groupedAppointments[dateString]) {
-      const count = groupedAppointments[dateString].length;
+      const appointments = groupedAppointments[dateString];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      const isUpcoming = selectedDate >= today;
+      const isPast = selectedDate < today;
+      
+      // Count different types of appointments
+      const upcomingCount = appointments.filter(apt => !apt.cancelled && !apt.isCompleted).length;
+      const completedCount = appointments.filter(apt => apt.isCompleted).length;
+      const cancelledCount = appointments.filter(apt => apt.cancelled).length;
+      
       return (
-        <div className="absolute top-0.5 t-1/2 transform -translate-x-1/2">
-          <div className="text-xs text-white bg-green-300 rounded-full px-2 py-0.5 min-w-[20px] text-center">
-            {count}
-          </div>
+        <div className="absolute top-0.5 right-0.5 flex flex-col gap-1">
+          {/* Upcoming/Scheduled appointments badge */}
+          {upcomingCount > 0 && (
+            <div className='text-xs text-white rounded-full px-2 py-0.5 min-w-[20px] text-center bg-red-500
+            '>
+              {upcomingCount}
+            </div>
+          )}
+          
+          {/* Completed appointments badge */}
+          {completedCount > 0 && (
+            <div className="text-xs text-white bg-green-500 rounded-full px-2 py-0.5 min-w-[20px] text-center">
+              {completedCount}
+            </div>
+          )}
+          
+          {/* Cancelled appointments badge */}
+          {cancelledCount > 0 && (
+            <div className="text-xs text-white bg-gray-500 rounded-full px-2 py-0.5 min-w-[20px] text-center">
+              {cancelledCount}
+            </div>
+          )}
         </div>
       );
     }
@@ -90,6 +122,20 @@ function formatDateToCustom(date) {
   const tileClassName = ({ date, view }) => {
     const dateString = formatDateToCustom(date);
     if (view === 'month' && groupedAppointments[dateString]) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      const isUpcoming = selectedDate >= today;
+      const isPast = selectedDate < today;
+      
+      if (isUpcoming) {
+        return 'has-appointments upcoming-appointments';
+      } else if (isPast) {
+        return 'has-appointments past-appointments';
+      }
       return 'has-appointments';
     }
     return null;
@@ -131,22 +177,53 @@ function formatDateToCustom(date) {
   };
 
   const getTodayAppointments = () => {
-    const today = new Date().toISOString().split('T')[0];
-    console.log("Today:", today);
+    const today = new Date();
     const todayFormat = formatDateToCustom(today);
-    console.log("Today Format:", todayFormat);
     return groupedAppointments[todayFormat] ? groupedAppointments[todayFormat].length : 0;
   };
 
   const getUpcomingAppointments = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    console.log("Debug - getUpcomingAppointments:");
+    console.log("Today:", today);
+    console.log("All appointments:", appointments);
+    
+    if (!appointments || appointments.length === 0) {
+      console.log("No appointments found");
+      return 0;
+    }
+    
+    const upcomingApps = appointments.filter(app => {
+      console.log("Processing appointment:", app);
+      console.log("SlotDate:", app.slotDate);
+      console.log("Cancelled:", app.cancelled);
+      console.log("IsCompleted:", app.isCompleted);
+      
+      // Convert slotDate from underscore format to actual Date
+      const dateParts = app.slotDate.split('_');
+      const appDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]); // year, month-1, day
+      appDate.setHours(0, 0, 0, 0);
+      
+      console.log("Converted appDate:", appDate);
+      console.log("Is upcoming?", appDate >= today);
+      console.log("Not cancelled?", !app.cancelled);
+      console.log("Not completed?", !app.isCompleted);
+      
+      return appDate >= today && !app.cancelled && !app.isCompleted;
+    });
+    
+    console.log("Upcoming appointments:", upcomingApps);
+    return upcomingApps.length;
+  };
 
-    console.log(today)
-    const todayFormat = formatDateToCustom(today);
-    return appointments ? appointments.filter(app => {
-      const appDate = slotDateFormat(app.slotDate);
-      return appDate >= todayFormat;
-    }).length : 0;
+  const getPendingAppointments = () => {
+    return appointments ? appointments.filter(app => !app.cancelled && !app.isCompleted).length : 0;
+  };
+
+  const getCompletedAppointments = () => {
+    return appointments ? appointments.filter(app => app.isCompleted).length : 0;
   };
 
   if (loading) {
@@ -217,7 +294,7 @@ function formatDateToCustom(date) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -238,13 +315,27 @@ function formatDateToCustom(date) {
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm">Upcoming</p>
+              <p className="text-red-100 text-sm">ALL Upcoming </p>
               <p className="text-3xl font-bold">{getUpcomingAppointments()}</p>
             </div>
-            <User className="w-8 h-8 text-purple-200" />
+            <svg className="w-8 h-8 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-emerald-100 text-sm">Completed</p>
+              <p className="text-3xl font-bold">{getCompletedAppointments()}</p>
+            </div>
+            <svg className="w-8 h-8 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
         </div>
       </div>
@@ -255,6 +346,26 @@ function formatDateToCustom(date) {
           <div className="lg:col-span-2">
             <div className='bg-white rounded-xl shadow-lg p-6'>
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Appointment Calendar</h2>
+              
+              {/* Legend */}
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Legend:</h4>
+                <div className="flex flex-wrap gap-4 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                    <span>All Upcoming </span>
+                  </div>
+            
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                    <span>Completed</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-500 rounded-full"></div>
+                    <span>Cancelled</span>
+                  </div>
+                </div>
+              </div>
               <style jsx>{`
             .react-calendar {
               width: 100%;
@@ -265,21 +376,36 @@ function formatDateToCustom(date) {
               position: relative;
               padding: 0.75em 0.5em;
               border: 1px solid #e5e7eb;
+              height: 60px;
             }
             .react-calendar__tile--active {
-              background: #fef3c7 !important;
+              background: #3b82f6 !important;
               color: white;
             }
             .react-calendar__tile--now {
-              background: #fef3c7;
+              background: #92400e;
               color: #92400e;
+              border: 2px solid #f59e0b;
             }
             .react-calendar__tile.has-appointments {
-              background-color: #eff6ff;
-              border-color: #3b82f6;
+              font-weight: 600;
+            }
+            .react-calendar__tile.upcoming-appointments {
+              background-color: #fef2f2;
+              border-color: #f87171;
+            }
+            .react-calendar__tile.past-appointments {
+              background-color: #f3f4f6;
+              border-color: #9ca3af;
             }
             .react-calendar__tile:hover {
               background-color: #f3f4f6;
+            }
+            .react-calendar__tile.upcoming-appointments:hover {
+              background-color: #fee2e2;
+            }
+            .react-calendar__tile.past-appointments:hover {
+              background-color: #e5e7eb;
             }
               `}</style>
               <Calendar 
@@ -326,6 +452,7 @@ function formatDateToCustom(date) {
                     : 'bg-amber-100 text-amber-800'
                 }`}>
                   {appointment.payment ? '💰 Payment Received' : '⚠️ Payment Pending'}
+                  {console.log("Payment Status:", appointment.payment)}
                 </span>
                   </div>
                   <div className="flex items-center text-sm mt-2">
@@ -355,7 +482,7 @@ function formatDateToCustom(date) {
           {Object.keys(groupedAppointments).length > 0 ? (
             <div className="space-y-6">
               {Object.entries(groupedAppointments)
-                .sort(([a], [b]) => new Date(a) - new Date(b))
+                .sort(([a], [b]) => new Date(b) - new Date(a))
                 .map(([date, dayAppointments]) => (
                 <div key={date} className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
