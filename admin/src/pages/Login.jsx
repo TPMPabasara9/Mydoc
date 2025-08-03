@@ -6,6 +6,8 @@ import axios from "axios";
 import {  toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { DoctorContext } from "../context/DoctorContext.jsx";
+import { Icon } from "lucide-react";
+import { UserCog, Stethoscope } from "lucide-react";
 
 
 
@@ -42,6 +44,9 @@ const Login = ()=>{
                     if(data.success){
                         localStorage.setItem('dToken',data.token)
                         setDToken(data.token)
+                        navigate('/doctor-dashboard');
+                        toast.success("Login successful");
+                        
                         console.log(data.token)
                       
                     }else{
@@ -49,42 +54,87 @@ const Login = ()=>{
                     }
                       
                 }
-
-
-
             }catch (error) {
                 
             }
      
         }
+    // Choose icon based on state
+    const iconProps = {
+        className: "w-10 h-10 mb-2",
+        style: { color: state === "Admin" ? "#6366F1" : "#10B981" } // Indigo for Admin, Emerald for Doctor
+    };
 
+    // Use Lucide icons for demonstration
 
-
-    return(
+    return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-            <form onSubmit={onSubmithandler} className="min-h-[80vh] flex items-center" >
-                <div className="flex flex-col gap-3 items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg">
-                   <div> 
-                    <p className="text-2xl font-semibold m-auto "><span className="text-indigo-500">{state}</span> Login</p>
+            <img className="w-70 mb-2" src="\src\assets\logo.svg" alt="Logo" />
+            <form onSubmit={onSubmithandler} className="min-h-[80vh] flex items-center">
+                <div className="flex flex-col gap-4 items-start p-12 min-w-[400px] sm:min-w-[500px] border rounded-xl text-zinc-600 text-sm shadow-lg bg-white">
+                    <div className="flex flex-col items-center w-full mb-4">
+                        <p className="text-3xl font-semibold m-auto">
+                            <span className={state === "Admin" ? "text-indigo-500" : "text-emerald-500"}>
+                                {state}
+                            </span> Login
+                        </p>
+                        {state === "Admin" ? (
+                            <UserCog {...iconProps} />
+                        ) : (
+                            <Stethoscope {...iconProps} />
+                        )}
+                    </div>
+                    <div className="w-full">
+                        <p className="text-base">Email</p>
+                        <input
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="border border-[#DADADA] rounded-full p-3 mt-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            type="email"
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
+                    <div className="w-full">
+                        <p className="text-base">Password</p>
+                        <input
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="border border-[#DADADA] rounded-full p-3 mt-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                            type="password"
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+                    <button className={`w-full py-3 rounded-md text-base font-medium transition-colors ${
+                        state === "Admin"
+                            ? "bg-indigo-500 hover:bg-indigo-600"
+                            : "bg-emerald-500 hover:bg-emerald-600"
+                    } text-white`}>
+                        Login
+                    </button>
+                    {state === "Admin" ? (
+                        <p>
+                            Doctor Login?{" "}
+                            <span
+                                className="text-emerald-500 underline cursor-pointer"
+                                onClick={() => setState("Doctor")}
+                            >
+                                Click here
+                            </span>
+                        </p>
+                    ) : (
+                        <p>
+                            Admin Login?{" "}
+                            <span
+                                className="text-indigo-500 underline cursor-pointer"
+                                onClick={() => setState("Admin")}
+                            >
+                                Click here
+                            </span>
+                        </p>
+                    )}
                 </div>
-                <div className="w-full">
-                    <p>Email</p>
-                    <input onChange={(e)=>setEmail(e.target.value)} className="border border-[#DADADA] rounded-full p-2 mt-1" type="email" placeholder="Enter your email"  required/>
-                </div>
-                <div>
-                    <p>Password</p>
-                    <input onChange={(e)=>setPassword(e.target.value)} className="border border-[#DADADA] rounded-full p-2 mt-1"  type="password" placeholder="Enter your password"  required/>
-                </div>
-                <button className="bg-indigo-500 text-white w-full py-2 rounded-md text-base">Login</button>
-                {
-                    state === 'Admin' ? 
-                    <p>Doctor Login? <span className="text-indigo-500 underline cursor-pointer" onClick={()=>setState('Doctor')}> Click here</span></p>
-                    : <p>Admin Login?<span className="text-indigo-500 underline cursor-pointer" onClick={()=>setState('Admin')}>Click here</span> </p>
-                }
-                </div>
-           </form>
-      </div>
-        
-    )
+            </form>
+        </div>
+    );
 }
 export default Login;
