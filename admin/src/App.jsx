@@ -14,6 +14,7 @@ import { DoctorContext } from './context/DoctorContext';
 import DoctorDashBoard from './pages/Doctor/DoctorDashBoard';
 import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import DoctorProfile from './pages/Doctor/DoctorProfile';
+import AdminFooter from './components/AdminFooter.jsx';
 
 const App = () =>{
 
@@ -21,33 +22,39 @@ const App = () =>{
   const {dToken} = useContext(DoctorContext);
 
   return aToken || dToken ? (
-    <div className='bg-[#F8F9FD]' >
+    <div className='min-h-screen flex flex-col bg-[#F8F9FD]'>
       <ToastContainer/>
       <Navbar/>
-      <div className='flex items-start'>
+      <div className='flex-1 flex items-start'>
         <Sidebar/>
-        <Routes>
-          {/*admin Route*/ }
-          <Route path='/' element={<></>} />
-          <Route path='/admin-dashboard' element={<Dashboard/>} />
-          <Route path='/all-appointments' element={<AllAppointments/>} />
-          <Route path='/add-doctor' element={<AddDoctor/>} />
-          <Route path='/doctor-list' element={<DoctorList/>} />
+        <div className='flex-1 flex flex-col min-h-screen'>
+          <div className='flex-1 p-4'>
+            <Routes>
+              {/*admin Route*/ }
+              <Route path='/' element={<></>} />
+              <Route path='/admin-dashboard' element={<Dashboard/>} />
+              <Route path='/all-appointments' element={<AllAppointments/>} />
+              <Route path='/add-doctor' element={<AddDoctor/>} />
+              <Route path='/doctor-list' element={<DoctorList/>} />
 
-          {/*doctor Route*/ }
-         
-          <Route path='/doctor-dashboard' element={<DoctorDashBoard/>} />
-          <Route path='/doctor-appointments' element={<DoctorAppointment/>} />
-          <Route path='/doctor-profile' element={<DoctorProfile/>} />
-          
-        </Routes>
+              {/*doctor Route*/ }
+              <Route path='/doctor-dashboard' element={<DoctorDashBoard/>} />
+              <Route path='/doctor-appointments' element={<DoctorAppointment/>} />
+              <Route path='/doctor-profile' element={<DoctorProfile/>} />
+            </Routes>
+          </div>
+          <AdminFooter />
+        </div>
       </div>
     </div>
-  ): (
-    <>
-    <Login />
-    <ToastContainer/>
-    </>
+  ) : (
+    <div className='min-h-screen flex flex-col'>
+      <div className='flex-1'>
+        <Login />
+      </div>
+      <ToastContainer/>
+      <AdminFooter />
+    </div>
   )
 }
 
